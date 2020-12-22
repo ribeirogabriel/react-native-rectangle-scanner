@@ -19,12 +19,6 @@ class Scanner extends React.Component {
     onRectangleDetected: PropTypes.func,
     onTorchChanged: PropTypes.func,
     onErrorProcessingImage: PropTypes.func,
-    androidPermission: PropTypes.oneOfType([PropTypes.bool, PropTypes.shape({
-      title: PropTypes.string,
-      message: PropTypes.string,
-      buttonNegative: PropTypes.string,
-      buttonPositive: PropTypes.string,
-    })]),
   };
 
   static defaultProps = {
@@ -35,12 +29,6 @@ class Scanner extends React.Component {
     onRectangleDetected: null,
     onErrorProcessingImage: null,
     capturedQuality: 0.5,
-    androidPermission: {
-      title: 'Permission to Access the Camera?',
-      message: 'Allows you to scan documents',
-      buttonNegative: "Don't Allow",
-      buttonPositive: 'OK',
-    },
   }
 
   constructor(props) {
@@ -104,15 +92,9 @@ class Scanner extends React.Component {
   }
 
   askForAndroidCameraForPermission = async (onComplete) => {
-    if (!this.props.androidPermission) {
-      if (onComplete) onComplete();
-      return;
-    }
-
     try {
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-        this.props.androidPermission,
+        PermissionsAndroid.PERMISSIONS.CAMERA
       );
 
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {

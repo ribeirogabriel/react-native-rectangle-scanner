@@ -2,4 +2,4 @@ rootProject.name = 'rectanglescanner'
 
 include ':app'
 include ':openCVLibrary410'
-project(':openCVLibrary410').projectDir = new File(rootProject.projectDir,'../node_modules/react-native-rectangle-scanner/android')
+project(':openCVLibrary410').projectDir = new File(rootProject.projectDir,'../node_modules/react-native-rectangle-scanner/android/openCVLibrary410')

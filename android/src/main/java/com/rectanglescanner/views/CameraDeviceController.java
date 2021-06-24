@@ -241,23 +241,37 @@ public class CameraDeviceController extends JavaCameraView implements PictureCal
     that fits the ratio the best.
     */
     private Camera.Size getOptimalResolution(float ratioToFitTo, List<Camera.Size> resolutionList) {
-        Camera.Size bestSize = null;
-        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        long availableMemory = Runtime.getRuntime().maxMemory() - used;
-        for (Camera.Size currentSize : resolutionList) {
-            int newArea = currentSize.width * currentSize.height;
-            long neededMemory = newArea * 4 * 4; // newArea * 4 Bytes/pixel * 4 needed copies of the bitmap (for safety :) )
-            boolean isDesiredRatio = (currentSize.width / 4) == (currentSize.height / 3);
-            boolean isBetterSize = (bestSize == null || currentSize.width > bestSize.width);
-            boolean isSafe = neededMemory < availableMemory;
-            if (isDesiredRatio && isBetterSize && isSafe) {
-                bestSize = currentSize;
+        int maxPixels = 0;
+        int ratioMaxPixels = 0;
+        double bestRatioDifference = 5;
+        Camera.Size currentMaxRes = null;
+        Camera.Size ratioCurrentMaxRes = null;
+        for (Camera.Size r : resolutionList) {
+            float pictureRatio = (float) r.width / r.height;
+            Log.d(TAG, "supported resolution: " + r.width + "x" + r.height + " ratio: " + pictureRatio + " ratioToFitTo: " + ratioToFitTo);
+            int resolutionPixels = r.width * r.height;
+            double ratioDifference = Math.abs(ratioToFitTo - pictureRatio);
+            if (resolutionPixels > ratioMaxPixels && ratioDifference < bestRatioDifference) {
+                ratioMaxPixels = resolutionPixels;
+                ratioCurrentMaxRes = r;
+                bestRatioDifference = ratioDifference;
+            }
+
+            if (resolutionPixels > maxPixels) {
+                maxPixels = resolutionPixels;
+                currentMaxRes = r;
             }
         }
-        if (bestSize == null) {
-            return resolutionList.get(0);
+
+        if (ratioCurrentMaxRes != null) {
+
+            Log.d(TAG, "Max supported resolution with aspect ratio: " + ratioCurrentMaxRes.width + "x"
+                    + ratioCurrentMaxRes.height);
+            return ratioCurrentMaxRes;
+
         }
-        return bestSize;
+
+        return currentMaxRes;
     }
 
     //================================================================================
